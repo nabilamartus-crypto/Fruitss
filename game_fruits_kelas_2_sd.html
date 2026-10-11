@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fun Fruits! - Bahasa Inggris Kelas 2 SD</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Quicksand -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * {
+            font-family: 'Fredoka', 'Quicksand', sans-serif;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .bg-fruits-pattern {
+            background-color: #fefce8;
+            background-image: radial-gradient(#fde047 2px, transparent 2px), radial-gradient(#fde047 2px, #fefce8 2px);
+            background-size: 36px 36px;
+            background-position: 0 0, 18px 18px;
+        }
+
+        .bouncy-btn {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .bouncy-btn:hover {
+            transform: scale(1.03) translateY(-2px);
+        }
+        .bouncy-btn:active {
+            transform: scale(0.96) translateY(2px);
+        }
+
+        .card-flip {
+            perspective: 1000px;
+        }
+        .card-inner {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        @keyframes letter-pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); color: #ea580c; font-weight: 800; }
+            100% { transform: scale(1); }
+        }
+        .letter-active {
+            display: inline-block;
+            animation: letter-pop 0.35s ease-in-out;
+            color: #ea580c;
+            font-weight: 800;
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-certificate, #printable-certificate * {
+                visibility: visible;
+            }
+            #printable-certificate {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-fruits-pattern min-h-screen text-slate-800 flex flex-col justify-between overflow-y-auto">
+
+    <!-- STUDENT REGISTRATION MODAL -->
+    <div id="modal-registration" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-3xl p-5 sm:p-8 max-w-sm sm:max-w-md w-full border-4 sm:border-8 border-orange-300 shadow-2xl space-y-4 sm:space-y-6 text-center floating my-auto relative">
+            <div class="bg-orange-100 text-orange-600 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto text-3xl sm:text-4xl shadow-inner border-2 border-orange-300">
+                🍍
+            </div>
+
+            <div>
+                <span class="bg-orange-100 text-orange-800 text-[10px] sm:text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                    Bahasa Inggris SD Kelas 2
+                </span>
+                <h2 class="text-xl sm:text-3xl font-black text-slate-800 mt-1.5 sm:mt-2">Belajar "Fruits"! 🍓</h2>
+                <p class="text-slate-500 text-xs sm:text-sm font-medium mt-1">Tulis nama dan pilih kelasmu dulu ya!</p>
+            </div>
+
+            <form onsubmit="handleRegistration(event)" class="space-y-3 sm:space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-black text-slate-700 uppercase tracking-wide mb-1">
+                        <i class="fa-solid fa-user-pen text-orange-500 mr-1"></i> Nama Lengkap Siswa:
+                    </label>
+                    <input type="text" id="reg-student-name" required placeholder="Contoh: Ani Rahmawati"
+                        class="w-full px-3.5 py-2.5 sm:py-3 rounded-2xl border-2 border-orange-200 focus:border-orange-500 font-bold outline-none text-slate-800 text-sm shadow-sm transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-700 uppercase tracking-wide mb-1">
+                        <i class="fa-solid fa-school text-orange-500 mr-1"></i> Pilih Kelas:
+                    </label>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="reg-class" value="2 A" checked class="peer hidden">
+                            <div class="p-2.5 sm:p-3 text-center rounded-2xl border-2 border-slate-200 peer-checked:border-orange-500 peer-checked:bg-orange-100 peer-checked:text-orange-900 font-black text-sm sm:text-base shadow-sm transition">
+                                🏫 Kelas 2 A
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="reg-class" value="2 B" class="peer hidden">
+                            <div class="p-2.5 sm:p-3 text-center rounded-2xl border-2 border-slate-200 peer-checked:border-orange-500 peer-checked:bg-orange-100 peer-checked:text-orange-900 font-black text-sm sm:text-base shadow-sm transition">
+                                🏫 Kelas 2 B
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bouncy-btn bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-lg py-3 rounded-2xl shadow-lg border-b-4 border-emerald-700 flex items-center justify-center gap-2 mt-2">
+                    <span>Mulai Bermain!</span>
+                    <i class="fa-solid fa-circle-play"></i>
+                </button>
+            </form>
+
+            <div class="pt-2 border-t border-slate-100">
+                <button onclick="openTeacherAuthModal()" class="text-xs font-bold text-slate-400 hover:text-orange-600 flex items-center justify-center gap-1 mx-auto">
+                    <i class="fa-solid fa-lock text-[10px]"></i> Mode Guru / Rekap Asesmen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <header class="bg-white/95 backdrop-blur-md sticky top-0 z-40 border-b-4 border-orange-300 shadow-sm px-3 sm:px-4 py-2 sm:py-3">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3">
+            <div class="flex items-center justify-between w-full sm:w-auto">
+                <div class="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onclick="switchSection('home')">
+                    <div class="bg-orange-400 text-white p-2 rounded-xl shadow text-xl sm:text-2xl font-bold">
+                        🍓
+                    </div>
+                    <div>
+                        <h1 class="text-base sm:text-xl font-black text-orange-600 tracking-wide leading-none">Fun Fruits!</h1>
+                        <p class="text-[10px] sm:text-[11px] text-orange-800 font-bold mt-0.5">Bahasa Inggris Kelas 2 SD</p>
+                    </div>
+                </div>
+
+                <!-- Control Buttons Mobile & Desktop -->
+                <div class="flex items-center gap-2">
+                    <button onclick="openTeacherAuthModal()" class="bg-purple-100 hover:bg-purple-200 text-purple-800 px-2.5 py-1.5 rounded-xl text-xs font-black flex items-center gap-1 shadow-sm border border-purple-300">
+                        <i class="fa-solid fa-clipboard-user text-purple-600"></i>
+                        <span class="hidden xs:inline">Asesmen Guru</span>
+                    </button>
+
+                    <!-- Student Profile Badge Mobile -->
+                    <div class="sm:hidden bg-orange-100 px-2.5 py-1 rounded-full text-[11px] font-black text-orange-900 flex items-center gap-1 border border-orange-300">
+                        <i class="fa-solid fa-user-graduate text-orange-600"></i>
+                        <span id="badge-student-mobile">Siswa</span> (<span id="badge-class-mobile">2A</span>)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Controls & Profile -->
+            <div class="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto justify-between sm:justify-end">
+                <div class="hidden sm:flex items-center gap-2 bg-orange-50 border-2 border-orange-200 px-3 py-1 rounded-2xl text-xs font-bold text-orange-900">
+                    <i class="fa-solid fa-user-graduate text-orange-600 text-sm"></i>
+                    <div>
+                        <div id="badge-student-name" class="font-black">Ani Rahmawati</div>
+                        <div id="badge-student-class" class="text-[10px] text-orange-700">Kelas 2 A</div>
+                    </div>
+                    <button onclick="openRegistrationModal()" title="Ganti Nama/Kelas" class="ml-1 text-slate-400 hover:text-orange-600">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                </div>
+
+                <!-- Stage Nav Buttons -->
+                <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-2xl border border-slate-200 w-full sm:w-auto justify-around">
+                    <button id="nav-btn-1" onclick="switchSection('memorize')" class="px-2 sm:px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm transition flex items-center gap-1">
+                        <span>1.</span> <span>Hafalan 🧠</span>
+                    </button>
+                    <button id="nav-btn-2" onclick="switchSection('recall')" class="px-2 sm:px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm transition flex items-center gap-1">
+                        <span>2.</span> <span>Mengingat 🧩</span>
+                    </button>
+                    <button id="nav-btn-3" onclick="switchSection('test')" class="px-2 sm:px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm transition flex items-center gap-1">
+                        <span>3.</span> <span>Ujian ✏️</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto w-full p-3 sm:p-6 flex-grow flex flex-col justify-center">
+
+        <!-- SECTION HOME -->
+        <section id="sec-home" class="space-y-4 sm:space-y-6 text-center my-auto py-2">
+            <div class="bg-white rounded-3xl p-5 sm:p-8 shadow-xl border-4 border-emerald-300 relative overflow-hidden">
+                <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold text-xs tracking-wider uppercase inline-block mb-2">
+                    Halo, <span id="welcome-student-name">Siswa</span> (<span id="welcome-student-class">Kelas 2 A</span>)!
+                </span>
+
+                <h2 class="text-xl sm:text-3xl md:text-4xl font-black text-slate-800 leading-snug mb-2">
+                    Mari Belajar Kosa Kata <br class="hidden sm:inline"><span class="text-emerald-600">"FRUITS" (Buah-Buahan)</span> 🍍🍉
+                </h2>
+
+                <p class="text-slate-600 text-xs sm:text-base max-w-xl mx-auto mb-6 font-medium">
+                    Ada 9 buah-buahan lezat! Dengarkan ejaannya, mainkan gamenya, dan kirim hasil tesmu ke Ibu/Bapak Guru!
+                </p>
+
+                <!-- 3 Stage Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto mb-6">
+                    <div onclick="switchSection('memorize')" class="bg-orange-50 hover:bg-orange-100 border-2 border-orange-300 p-4 rounded-2xl cursor-pointer bouncy-btn text-left flex md:flex-col items-center md:items-start gap-3 md:gap-1">
+                        <div class="text-2xl sm:text-3xl">1️⃣ 📢</div>
+                        <div>
+                            <h3 class="font-black text-orange-700 text-sm sm:text-base">1. Memorization</h3>
+                            <p class="text-[11px] text-orange-900 mt-0.5">Suara kata & ejaan huruf demi huruf (Spelling).</p>
+                        </div>
+                    </div>
+
+                    <div onclick="switchSection('recall')" class="bg-blue-50 hover:bg-blue-100 border-2 border-blue-300 p-4 rounded-2xl cursor-pointer bouncy-btn text-left flex md:flex-col items-center md:items-start gap-3 md:gap-1">
+                        <div class="text-2xl sm:text-3xl">2️⃣ 🧩</div>
+                        <div>
+                            <h3 class="font-black text-blue-700 text-sm sm:text-base">2. Recall Game</h3>
+                            <p class="text-[11px] text-blue-900 mt-0.5">Mencocokkan kartu gambar & kata Bahasa Inggris.</p>
+                        </div>
+                    </div>
+
+                    <div onclick="switchSection('test')" class="bg-purple-50 hover:bg-purple-100 border-2 border-purple-300 p-4 rounded-2xl cursor-pointer bouncy-btn text-left flex md:flex-col items-center md:items-start gap-3 md:gap-1">
+                        <div class="text-2xl sm:text-3xl">3️⃣ 🏅</div>
+                        <div>
+                            <h3 class="font-black text-purple-700 text-sm sm:text-base">3. Test / Kuis</h3>
+                            <p class="text-[11px] text-purple-900 mt-0.5">Ujian 10 soal & kirim nilai ke WA Guru!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="switchSection('memorize')" class="bouncy-btn bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-lg px-8 py-3.5 rounded-2xl shadow-lg border-b-4 border-emerald-700 inline-flex items-center gap-2">
+                    <span>Mulai Tahap 1 (Hafalan Buah)</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 1: MEMORIZATION -->
+        <section id="sec-memorize" class="hidden space-y-4">
+            <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xl border-4 border-orange-300">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                    <div>
+                        <span class="inline-block bg-orange-100 text-orange-800 font-black px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs mb-1">
+                            TAHAP 1 DARI 3
+                        </span>
+                        <h2 class="text-xl sm:text-2xl font-black text-orange-600">
+                            🧠 Memorization (Mengenal & Eja Huruf)
+                        </h2>
+                    </div>
+
+                    <button onclick="switchSection('recall')" class="bouncy-btn bg-blue-500 text-white font-bold px-4 py-2 rounded-xl shadow border-b-4 border-blue-700 text-xs flex items-center gap-1.5 self-end sm:self-auto">
+                        <span>Lanjut ke Recall Game</span>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4" id="vocab-cards-container">
+                    <!-- Cards populated via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: RECALL -->
+        <section id="sec-recall" class="hidden space-y-4">
+            <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xl border-4 border-blue-300">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                    <div>
+                        <span class="inline-block bg-blue-100 text-blue-800 font-black px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs mb-1">
+                            TAHAP 2 DARI 3
+                        </span>
+                        <h2 class="text-xl sm:text-2xl font-black text-blue-600">
+                            🧩 Recall Game (Pilih & Mencocokkan)
+                        </h2>
+                    </div>
+
+                    <div class="flex gap-2 self-end sm:self-auto">
+                        <button onclick="setRecallTab('memory')" id="tab-btn-memory" class="px-3 py-1.5 rounded-xl font-bold text-xs bg-blue-600 text-white shadow">
+                            🎴 Flipping Match
+                        </button>
+                        <button onclick="setRecallTab('drag')" id="tab-btn-drag" class="px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-600 hover:bg-slate-200">
+                            🎯 Pick The Word
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-GAME 1: MEMORY CARD FLIP -->
+                <div id="recall-sub-memory" class="space-y-3">
+                    <div class="bg-blue-50 p-2.5 rounded-2xl flex justify-between items-center border border-blue-200">
+                        <span class="font-bold text-blue-900 text-xs">Buka & cocokkan 6 pasangan kartu buah!</span>
+                        <button onclick="initMemoryGame()" class="bg-blue-500 hover:bg-blue-600 text-white font-bold px-2.5 py-1 rounded-xl text-xs bouncy-btn shadow">
+                            <i class="fa-solid fa-rotate-right"></i> Acak Kartu
+                        </button>
+                    </div>
+
+                    <div id="memory-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3 my-2">
+                        <!-- Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- SUB-GAME 2: PICK THE RIGHT WORD -->
+                <div id="recall-sub-drag" class="hidden space-y-4">
+                    <div class="bg-indigo-50 p-2.5 rounded-2xl border border-indigo-200 flex justify-between items-center">
+                        <span class="font-bold text-indigo-900 text-xs">Pilih kata Bahasa Inggris yang tepat!</span>
+                        <span id="drag-score-counter" class="bg-indigo-600 text-white font-bold text-[11px] px-2.5 py-0.5 rounded-full">Progres: 1 / 9</span>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4 items-center justify-center bg-orange-50/60 p-4 sm:p-6 rounded-3xl border-2 border-dashed border-indigo-200">
+                        <div class="text-center">
+                            <div id="drag-item-icon" class="text-6xl sm:text-7xl bg-white p-4 rounded-3xl shadow-md border-4 border-orange-300 inline-block floating">
+                                🍍
+                            </div>
+                            <div id="drag-item-indo" class="mt-2 text-sm sm:text-base font-black text-slate-700 bg-white px-3 py-1 rounded-full shadow-sm inline-block">
+                                Nanas
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-72 space-y-2" id="drag-options-container">
+                            <!-- Options injected JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2 border-t border-slate-100">
+                    <button onclick="switchSection('test')" class="bouncy-btn bg-purple-600 text-white font-black px-5 py-2.5 rounded-2xl shadow border-b-4 border-purple-800 text-xs sm:text-sm flex items-center gap-2">
+                        <span>Lanjut ke Ujian (Tahap 3)</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: TEST -->
+        <section id="sec-test" class="hidden space-y-4">
+            <div class="bg-white rounded-3xl p-4 sm:p-6 shadow-xl border-4 border-purple-300">
+                <div id="quiz-header-bar" class="mb-4">
+                    <div class="flex justify-between items-center mb-1.5">
+                        <span class="text-[11px] font-black text-purple-700 uppercase tracking-wider">
+                            <i class="fa-solid fa-pen-nib mr-1"></i> Ujian Bahasa Inggris - Fruits
+                        </span>
+                        <span id="quiz-step-text" class="text-[11px] font-black text-purple-900 bg-purple-100 px-2.5 py-0.5 rounded-full">
+                            Soal 1 dari 10
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden p-0.5 border border-slate-200">
+                        <div id="quiz-progress" class="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+                    </div>
+                </div>
+
+                <!-- Active Question Card -->
+                <div id="quiz-card" class="space-y-4">
+                    <div class="bg-purple-50/70 p-4 sm:p-6 rounded-2xl border-2 border-purple-200 text-center relative">
+                        <span id="quiz-type-badge" class="absolute top-2 left-2 bg-purple-200 text-purple-800 text-[10px] font-black px-2 py-0.5 rounded-md">
+                            Pilihan Ganda
+                        </span>
+
+                        <div id="quiz-visual-area" class="my-2 min-h-[70px] flex items-center justify-center">
+                            <!-- Visual content injected via JS -->
+                        </div>
+
+                        <h3 id="quiz-question-text" class="text-base sm:text-xl font-black text-slate-800">
+                            Bahasa Inggris dari "Nanas" adalah?
+                        </h3>
+                    </div>
+
+                    <div id="quiz-options-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <!-- Options injected JS -->
+                    </div>
+                </div>
+
+                <!-- Quiz Result Screen -->
+                <div id="quiz-result-card" class="hidden text-center space-y-4 py-2">
+                    <div class="text-5xl sm:text-6xl mb-1 floating">🏆</div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-slate-800">Ujian Selesai!</h2>
+
+                    <div class="flex justify-center items-center gap-1.5 text-3xl text-amber-400" id="star-rating">
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+
+                    <div class="bg-orange-50 max-w-sm mx-auto p-4 rounded-2xl border-2 border-orange-300 shadow-sm space-y-1">
+                        <div class="text-[10px] text-orange-800 font-black tracking-wider">NILAI AKHIR HASIL TES</div>
+                        <div id="final-score" class="text-4xl font-black text-orange-600 my-0.5">100</div>
+                        <div id="final-student-info" class="text-xs font-black text-slate-700">Ani Rahmawati (Kelas 2 A)</div>
+
+                        <!-- PESAN PUJIAN / COMPLIMENT BOX -->
+                        <div id="compliment-box" class="bg-white p-3 rounded-xl border border-orange-200 mt-2 text-center">
+                            <div id="compliment-en" class="font-black text-sm sm:text-base text-purple-700">
+                                "Excellent! You're doing great!"
+                            </div>
+                            <div id="compliment-id" class="text-xs font-semibold text-slate-600 mt-0.5">
+                                (Sangat baik! Kamu melakukannya dengan sangat hebat!)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-center gap-2.5 max-w-md mx-auto pt-1">
+                        <!-- TOMBOL WA GURU -->
+                        <a id="btn-wa-guru" href="#" target="_blank" class="bouncy-btn bg-emerald-600 hover:bg-emerald-700 text-white font-black px-5 py-3 rounded-2xl shadow-lg border-b-4 border-emerald-800 text-xs sm:text-sm flex items-center justify-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                            <span>Kirim Nilai ke WA Guru (085357959694)</span>
+                        </a>
+
+                        <button onclick="resetQuiz()" class="bouncy-btn bg-purple-600 text-white font-black px-4 py-3 rounded-2xl shadow border-b-4 border-purple-800 text-xs sm:text-sm flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-rotate-right"></i> Ulangi Tes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEACHER ASSESSMENT DASHBOARD MODAL -->
+        <div id="modal-teacher-dashboard" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
+            <div class="bg-white rounded-3xl p-4 sm:p-6 max-w-3xl w-full border-4 sm:border-8 border-purple-300 relative shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                <button onclick="closeTeacherDashboard()" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 text-xl font-bold">
+                    ✕
+                </button>
+
+                <div class="flex items-center gap-3 border-b border-purple-100 pb-3">
+                    <div class="bg-purple-100 text-purple-700 p-3 rounded-2xl text-2xl font-bold">
+                        📊
+                    </div>
+                    <div>
+                        <h3 class="text-lg sm:text-2xl font-black text-purple-900">Rekap Hasil Asesmen Guru</h3>
+                        <p class="text-xs text-slate-500 font-medium">Materi: Fruits (Bahasa Inggris Kelas 2 SD)</p>
+                    </div>
+                </div>
+
+                <!-- Filter & Controls -->
+                <div class="flex flex-wrap justify-between items-center gap-2 bg-purple-50 p-3 rounded-2xl border border-purple-200">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-purple-900">Filter Kelas:</span>
+                        <select id="filter-class" onchange="renderTeacherAssessmentTable()" class="bg-white border border-purple-300 rounded-xl px-2.5 py-1 text-xs font-bold text-slate-700 outline-none">
+                            <option value="ALL">Semua Kelas (2A & 2B)</option>
+                            <option value="2 A">Kelas 2 A</option>
+                            <option value="2 B">Kelas 2 B</option>
+                        </select>
+                    </div>
+
+                    <button onclick="clearAssessmentData()" class="text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold px-3 py-1.5 rounded-xl border border-rose-300 flex items-center gap-1">
+                        <i class="fa-solid fa-trash-can"></i> Hapus Data
+                    </button>
+                </div>
+
+                <!-- Assessment Table -->
+                <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                    <table class="w-full text-left text-xs text-slate-700">
+                        <thead class="bg-purple-600 text-white font-black uppercase text-[10px] tracking-wider">
+                            <tr>
+                                <th class="p-3">No</th>
+                                <th class="p-3">Nama Siswa</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3 text-center">Skor / Nilai</th>
+                                <th class="p-3">Kategori Pujian</th>
+                                <th class="p-3">Tanggal & Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assessment-table-body" class="divide-y divide-slate-100 font-medium">
+                            <!-- Injected JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button onclick="closeTeacherDashboard()" class="bg-slate-200 text-slate-700 font-bold px-5 py-2 rounded-xl text-xs bouncy-btn">
+                        Tutup Jendela
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEACHER AUTH MODAL (PIN) -->
+        <div id="modal-teacher-auth" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-3">
+            <div class="bg-white rounded-3xl p-5 max-w-xs w-full border-4 border-purple-400 text-center space-y-4 shadow-2xl">
+                <div class="text-4xl">🔐</div>
+                <div>
+                    <h3 class="font-black text-slate-800 text-lg">Akses Mode Guru</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Masukkan PIN Guru untuk melihat rekap nilai:</p>
+                </div>
+
+                <input type="password" id="teacher-pin-input" placeholder="Masukkan PIN (Default: 1234)"
+                    class="w-full text-center px-3 py-2.5 rounded-xl border-2 border-purple-200 font-black text-base outline-none focus:border-purple-500">
+
+                <div class="flex gap-2">
+                    <button onclick="submitTeacherPin()" class="w-full bg-purple-600 text-white font-bold py-2.5 rounded-xl text-xs bouncy-btn shadow">
+                        Masuk
+                    </button>
+                    <button onclick="closeTeacherAuthModal()" class="w-full bg-slate-200 text-slate-700 font-bold py-2.5 rounded-xl text-xs bouncy-btn">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white/90 border-t border-orange-200 py-2 text-center text-[11px] text-slate-500">
+        <p>✨ Fun Fruits! Bahasa Inggris SD Kelas 2 • WA Guru: 085357959694 ✨</p>
+    </footer>
+
+    <script>
+        const TEACHER_WA = '085357959694';
+        const TEACHER_PIN = '1234';
+
+        const VOCAB_DATA = [
+            { id: 'pineapple', en: 'Pineapple', id_name: 'Nanas', icon: '🍍' },
+            { id: 'mango', en: 'Mango', id_name: 'Mangga', icon: '🥭' },
+            { id: 'strawberry', en: 'Strawberry', id_name: 'Stroberi', icon: '🍓' },
+            { id: 'orange', en: 'Orange', id_name: 'Jeruk', icon: '🍊' },
+            { id: 'banana', en: 'Banana', id_name: 'Pisang', icon: '🍌' },
+            { id: 'grape', en: 'Grape', id_name: 'Anggur', icon: '🍇' },
+            { id: 'avocado', en: 'Avocado', id_name: 'Alpukat', icon: '🥑' },
+            { id: 'apple', en: 'Apple', id_name: 'Apel', icon: '🍎' },
+            { id: 'watermelon', en: 'Watermelon', id_name: 'Semangka', icon: '🍉' }
+        ];
+
+        let currentStudent = {
+            name: 'Ani Rahmawati',
+            studentClass: '2 A'
+        };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(160, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.18);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(450, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.06);
+            } else if (type === 'win') {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        function speakText(text, isSpelling = false, highlightContainerId = null) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+
+            if (isSpelling) {
+                const cleanChars = text.toUpperCase().split('');
+                let idx = 0;
+
+                function speakNextChar() {
+                    if (idx < cleanChars.length) {
+                        const char = cleanChars[idx];
+                        if (highlightContainerId) {
+                            const el = document.getElementById(highlightContainerId);
+                            if (el) {
+                                const spans = el.querySelectorAll('.spelling-char');
+                                spans.forEach((span, spanIdx) => {
+                                    if (spanIdx === idx) span.classList.add('letter-active');
+                                    else span.classList.remove('letter-active');
+                                });
+                            }
+                        }
+
+                        if (char !== ' ') {
+                            const letterUtterance = new SpeechSynthesisUtterance(char);
+                            letterUtterance.lang = 'en-US';
+                            letterUtterance.rate = 0.9;
+                            letterUtterance.onend = () => {
+                                idx++;
+                                setTimeout(speakNextChar, 180);
+                            };
+                            window.speechSynthesis.speak(letterUtterance);
+                        } else {
+                            idx++;
+                            setTimeout(speakNextChar, 200);
+                        }
+                    } else {
+                        if (highlightContainerId) {
+                            const el = document.getElementById(highlightContainerId);
+                            if (el) {
+                                const spans = el.querySelectorAll('.spelling-char');
+                                spans.forEach(s => s.classList.remove('letter-active'));
+                            }
+                        }
+                        const fullUtterance = new SpeechSynthesisUtterance(text);
+                        fullUtterance.lang = 'en-US';
+                        fullUtterance.rate = 0.85;
+                        window.speechSynthesis.speak(fullUtterance);
+                    }
+                }
+                speakNextChar();
+            } else {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function openRegistrationModal() {
+            playSound('click');
+            document.getElementById('modal-registration').classList.remove('hidden');
+        }
+
+        function handleRegistration(event) {
+            event.preventDefault();
+            playSound('click');
+
+            const nameInput = document.getElementById('reg-student-name').value.trim();
+            const classInput = document.querySelector('input[name="reg-class"]:checked').value;
+
+            if (!nameInput) return;
+
+            currentStudent.name = nameInput;
+            currentStudent.studentClass = classInput;
+
+            updateStudentProfileUI();
+            document.getElementById('modal-registration').classList.add('hidden');
+        }
+
+        function updateStudentProfileUI() {
+            document.getElementById('badge-student-name').textContent = currentStudent.name;
+            document.getElementById('badge-student-class').textContent = 'Kelas ' + currentStudent.studentClass;
+
+            document.getElementById('badge-student-mobile').textContent = currentStudent.name.split(' ')[0];
+            document.getElementById('badge-class-mobile').textContent = currentStudent.studentClass;
+
+            document.getElementById('welcome-student-name').textContent = currentStudent.name;
+            document.getElementById('welcome-student-class').textContent = 'Kelas ' + currentStudent.studentClass;
+        }
+
+        function switchSection(secId) {
+            playSound('click');
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+
+            const target = document.getElementById('sec-' + secId);
+            if (target) target.classList.remove('hidden');
+
+            ['1', '2', '3'].forEach(num => {
+                const btn = document.getElementById('nav-btn-' + num);
+                btn.className = "px-2 sm:px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm transition flex items-center gap-1 text-slate-600 hover:bg-slate-200";
+            });
+
+            if (secId === 'memorize') {
+                document.getElementById('nav-btn-1').className = "px-2 sm:px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm transition flex items-center gap-1 bg-orange-400 text-slate-900 shadow";
+            } else if (secId === 'recall') {
+                document.getElementById('nav-btn-2').className = "px-2 sm:px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm transition flex items-center gap-1 bg-blue-500 text-white shadow";
+            } else if (secId === 'test') {
+                document.getElementById('nav-btn-3').className = "px-2 sm:px-3 py-1.5 rounded-xl font-black text-xs sm:text-sm transition flex items-center gap-1 bg-purple-600 text-white shadow";
+                initQuiz();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderMemorizeCards() {
+            const container = document.getElementById('vocab-cards-container');
+            container.innerHTML = '';
+
+            VOCAB_DATA.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = "bg-orange-50/70 hover:bg-orange-100/80 border-2 border-orange-200 rounded-2xl p-3 text-center flex flex-col justify-between shadow-sm transition";
+
+                const charSpans = item.en.split('').map((char, i) => {
+                    if (char === ' ') return ' ';
+                    return `<span class="spelling-char inline-block" id="char-${item.id}-${i}">${char}</span>`;
+                }).join('');
+
+                card.innerHTML = `
+                    <div class="text-4xl sm:text-5xl my-1 floating">${item.icon}</div>
+                    <div class="font-black text-slate-800 text-sm sm:text-base leading-snug my-1" id="spell-target-${item.id}">
+                        ${charSpans}
+                    </div>
+                    <div class="text-[11px] font-bold text-orange-800 mb-2">${item.id_name}</div>
+
+                    <div class="space-y-1">
+                        <button onclick="speakText('${item.en}', false)" class="w-full bg-emerald-500 text-white font-bold py-1.5 px-2 rounded-xl text-xs bouncy-btn flex items-center justify-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-volume-high"></i> Suara
+                        </button>
+                        <button onclick="speakText('${item.en}', true, 'spell-target-${item.id}')" class="w-full bg-orange-400 text-orange-950 font-bold py-1.5 px-2 rounded-xl text-xs bouncy-btn flex items-center justify-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-spell-check"></i> Eja Huruf
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function setRecallTab(tab) {
+            playSound('click');
+            const memSub = document.getElementById('recall-sub-memory');
+            const dragSub = document.getElementById('recall-sub-drag');
+            const btnMem = document.getElementById('tab-btn-memory');
+            const btnDrag = document.getElementById('tab-btn-drag');
+
+            if (tab === 'memory') {
+                memSub.classList.remove('hidden');
+                dragSub.classList.add('hidden');
+                btnMem.className = "px-3 py-1.5 rounded-xl font-bold text-xs bg-blue-600 text-white shadow";
+                btnDrag.className = "px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-600 hover:bg-slate-200";
+            } else {
+                memSub.classList.add('hidden');
+                dragSub.classList.remove('hidden');
+                btnDrag.className = "px-3 py-1.5 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow";
+                btnMem.className = "px-3 py-1.5 rounded-xl font-bold text-xs bg-slate-100 text-slate-600 hover:bg-slate-200";
+                initDragGame();
+            }
+        }
+
+        let memoryDeck = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function initMemoryGame() {
+            const grid = document.getElementById('memory-grid');
+            grid.innerHTML = '';
+            flippedCards = [];
+            matchedPairs = 0;
+
+            const shuffledVocab = [...VOCAB_DATA].sort(() => 0.5 - Math.random()).slice(0, 6);
+
+            memoryDeck = [];
+            shuffledVocab.forEach(item => {
+                memoryDeck.push({ key: item.id, type: 'icon', val: item.icon, name: item.en });
+                memoryDeck.push({ key: item.id, type: 'text', val: item.en, name: item.en });
+            });
+
+            memoryDeck.sort(() => 0.5 - Math.random());
+
+            memoryDeck.forEach((card, idx) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = "card-flip h-20 sm:h-24 cursor-pointer";
+                cardEl.innerHTML = `
+                    <div class="card-inner w-full h-full relative border-2 border-blue-200 rounded-2xl shadow-sm bg-white" id="mem-card-${idx}" onclick="flipMemoryCard(${idx})">
+                        <div class="card-front absolute inset-0 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-2xl flex items-center justify-center text-white text-xl font-bold">
+                            ❓
+                        </div>
+                        <div class="card-back absolute inset-0 bg-white rounded-2xl flex items-center justify-center p-1 text-center border-2 border-blue-400">
+                            ${card.type === 'icon' ? `<span class="text-3xl">${card.val}</span>` : `<span class="font-black text-[11px] sm:text-xs text-indigo-700">${card.val}</span>`}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function flipMemoryCard(idx) {
+            if (flippedCards.length >= 2) return;
+            const cardInner = document.getElementById(`mem-card-${idx}`);
+            if (cardInner.classList.contains('flipped')) return;
+
+            playSound('click');
+            cardInner.classList.add('flipped');
+            flippedCards.push({ idx, data: memoryDeck[idx] });
+
+            if (flippedCards.length === 2) {
+                const [c1, c2] = flippedCards;
+                if (c1.data.key === c2.data.key && c1.idx !== c2.idx) {
+                    playSound('correct');
+                    matchedPairs++;
+                    speakText(c1.data.name);
+                    flippedCards = [];
+                    if (matchedPairs === 6) setTimeout(() => playSound('win'), 400);
+                } else {
+                    setTimeout(() => {
+                        playSound('wrong');
+                        document.getElementById(`mem-card-${c1.idx}`).classList.remove('flipped');
+                        document.getElementById(`mem-card-${c2.idx}`).classList.remove('flipped');
+                        flippedCards = [];
+                    }, 800);
+                }
+            }
+        }
+
+        let dragCurrentIndex = 0;
+        let dragItems = [];
+
+        function initDragGame() {
+            dragCurrentIndex = 0;
+            dragItems = [...VOCAB_DATA].sort(() => 0.5 - Math.random());
+            renderDragQuestion();
+        }
+
+        function renderDragQuestion() {
+            if (dragCurrentIndex >= dragItems.length) {
+                playSound('win');
+                initDragGame();
+                return;
+            }
+
+            const current = dragItems[dragCurrentIndex];
+            document.getElementById('drag-item-icon').textContent = current.icon;
+            document.getElementById('drag-item-indo').textContent = current.id_name;
+            document.getElementById('drag-score-counter').textContent = `Progres: ${dragCurrentIndex + 1} / ${dragItems.length}`;
+
+            const wrongOptions = VOCAB_DATA.filter(item => item.id !== current.id)
+                                          .sort(() => 0.5 - Math.random())
+                                          .slice(0, 3)
+                                          .map(item => item.en);
+
+            const allChoices = [current.en, ...wrongOptions].sort(() => 0.5 - Math.random());
+
+            const container = document.getElementById('drag-options-container');
+            container.innerHTML = '';
+
+            allChoices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-white hover:bg-indigo-50 border-2 border-indigo-200 text-indigo-900 font-black p-2.5 rounded-2xl shadow-sm bouncy-btn text-center text-xs sm:text-sm";
+                btn.textContent = choice;
+                btn.onclick = () => checkDragAnswer(choice, current.en, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkDragAnswer(selected, correct, btnEl) {
+            if (selected === correct) {
+                playSound('correct');
+                btnEl.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
+                speakText(correct);
+                dragCurrentIndex++;
+                setTimeout(renderDragQuestion, 700);
+            } else {
+                playSound('wrong');
+                btnEl.classList.add('bg-rose-100', 'border-rose-400', 'text-rose-700');
+            }
+        }
+
+        let currentQuizIndex = 0;
+        let quizScore = 0;
+        let quizQuestions = [];
+
+        function initQuiz() {
+            currentQuizIndex = 0;
+            quizScore = 0;
+            document.getElementById('quiz-result-card').classList.add('hidden');
+            document.getElementById('quiz-card').classList.remove('hidden');
+            document.getElementById('quiz-header-bar').classList.remove('hidden');
+
+            generateQuizQuestions();
+            renderQuizCard();
+        }
+
+        function generateQuizQuestions() {
+            quizQuestions = VOCAB_DATA.map(item => {
+                const randType = Math.floor(Math.random() * 3);
+                const wrongChoices = VOCAB_DATA.filter(v => v.id !== item.id)
+                                              .sort(() => 0.5 - Math.random())
+                                              .slice(0, 3)
+                                              .map(v => v.en);
+
+                const choices = [item.en, ...wrongChoices].sort(() => 0.5 - Math.random());
+
+                if (randType === 0) {
+                    return {
+                        badge: 'Soal Terjemahan',
+                        visual: `<div class="text-5xl sm:text-6xl floating">${item.icon}</div>`,
+                        question: `Bahasa Inggris dari "${item.id_name}" adalah?`,
+                        correct: item.en,
+                        choices: choices
+                    };
+                } else if (randType === 1) {
+                    return {
+                        badge: 'Kuis Audio 🎧',
+                        visual: `<button onclick="speakText('${item.en}')" class="bg-purple-500 hover:bg-purple-600 text-white font-bold p-4 rounded-full text-2xl shadow-lg bouncy-btn"><i class="fa-solid fa-volume-high"></i></button>`,
+                        question: `Tekan tombol audio di atas! Buah apakah itu?`,
+                        correct: item.en,
+                        choices: choices
+                    };
+                } else {
+                    return {
+                        badge: 'Ejaan Bahasa Inggris 🔤',
+                        visual: `<div class="text-5xl mb-1">${item.icon}</div>`,
+                        question: `Pilih Bahasa Inggris yang benar untuk "${item.id_name}"!`,
+                        correct: item.en,
+                        choices: choices
+                    };
+                }
+            });
+
+            // Add 1 extra question to make it 10 questions total
+            const extraItem = VOCAB_DATA[Math.floor(Math.random() * VOCAB_DATA.length)];
+            const extraWrong = VOCAB_DATA.filter(v => v.id !== extraItem.id).sort(() => 0.5 - Math.random()).slice(0, 3).map(v => v.en);
+            quizQuestions.push({
+                badge: 'Tebak Gambar 🍓',
+                visual: `<div class="text-6xl floating">${extraItem.icon}</div>`,
+                question: `Apakah nama buah ini dalam Bahasa Inggris?`,
+                correct: extraItem.en,
+                choices: [extraItem.en, ...extraWrong].sort(() => 0.5 - Math.random())
+            });
+
+            quizQuestions.sort(() => 0.5 - Math.random());
+        }
+
+        function renderQuizCard() {
+            if (currentQuizIndex >= quizQuestions.length) {
+                showQuizResults();
+                return;
+            }
+
+            const q = quizQuestions[currentQuizIndex];
+
+            document.getElementById('quiz-step-text').textContent = `Soal ${currentQuizIndex + 1} dari ${quizQuestions.length}`;
+            document.getElementById('quiz-progress').style.width = `${((currentQuizIndex + 1) / quizQuestions.length) * 100}%`;
+
+            document.getElementById('quiz-type-badge').textContent = q.badge;
+            document.getElementById('quiz-visual-area').innerHTML = q.visual;
+            document.getElementById('quiz-question-text').textContent = q.question;
+
+            const grid = document.getElementById('quiz-options-grid');
+            grid.innerHTML = '';
+
+            q.choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = "quiz-opt-btn bg-white hover:bg-purple-50 border-2 border-purple-200 hover:border-purple-400 text-purple-950 font-black p-3 rounded-2xl shadow-sm text-left bouncy-btn flex items-center justify-between text-xs sm:text-sm";
+                btn.innerHTML = `
+                    <span>${choice}</span>
+                    <i class="fa-regular fa-circle text-purple-300"></i>
+                `;
+                btn.onclick = () => handleQuizAnswer(choice, q.correct, btn);
+                grid.appendChild(btn);
+            });
+
+            if (q.badge.includes('Audio')) speakText(q.correct);
+        }
+
+        function handleQuizAnswer(selected, correct, btnEl) {
+            const allBtns = document.querySelectorAll('.quiz-opt-btn');
+            allBtns.forEach(b => b.onclick = null);
+
+            if (selected === correct) {
+                playSound('correct');
+                btnEl.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
+                btnEl.querySelector('i').className = "fa-solid fa-circle-check text-white";
+                quizScore += 10;
+            } else {
+                playSound('wrong');
+                btnEl.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
+                btnEl.querySelector('i').className = "fa-solid fa-circle-xmark text-white";
+
+                allBtns.forEach(b => {
+                    if (b.textContent.trim() === correct) {
+                        b.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900');
+                    }
+                });
+            }
+
+            currentQuizIndex++;
+            setTimeout(renderQuizCard, 1000);
+        }
+
+        function showQuizResults() {
+            playSound('win');
+            document.getElementById('quiz-card').classList.add('hidden');
+            document.getElementById('quiz-header-bar').classList.add('hidden');
+
+            const resultCard = document.getElementById('quiz-result-card');
+            resultCard.classList.remove('hidden');
+
+            document.getElementById('final-score').textContent = quizScore;
+            document.getElementById('final-student-info').textContent = `${currentStudent.name} (Kelas ${currentStudent.studentClass})`;
+
+            // ATURAN KALIMAT PUJIAN (COMPLIMENT)
+            let compEn = "";
+            let compId = "";
+
+            if (quizScore <= 60) {
+                compEn = '"Good job! Please try again!"';
+                compId = '(Kerja yang bagus! Yuk, coba lagi!)';
+            } else if (quizScore <= 80) {
+                compEn = '"Wonderful! Let\'s try again!"';
+                compId = '(Luar biasa! Ayo coba lagi!)';
+            } else {
+                compEn = '"Excellent! You\'re doing great!"';
+                compId = '(Sangat baik! Kamu melakukannya dengan sangat hebat!)';
+            }
+
+            document.getElementById('compliment-en').textContent = compEn;
+            document.getElementById('compliment-id').textContent = compId;
+
+            // Bintang Rating
+            const starContainer = document.getElementById('star-rating');
+            if (quizScore >= 80) {
+                starContainer.innerHTML = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>';
+            } else if (quizScore >= 60) {
+                starContainer.innerHTML = '<i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i>';
+            } else {
+                starContainer.innerHTML = '<i class="fa-solid fa-star"></i><i class="fa-regular fa-star"></i><i class="fa-regular fa-star"></i>';
+            }
+
+            // SIMPAN KE ASESMEN LOCALSTORAGE (GURU)
+            saveAssessmentData(quizScore, compEn);
+
+            // FORM LINK KIRIM KE WA GURU (085357959694)
+            const dateStr = new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+            const waMessage = `Halo Ibu/Bapak Guru! 👋%0A%0A*LAPORAN HASIL ASESMEN UJIAN FRUITS*%0A%0A👤 *Nama Siswa:* ${currentStudent.name}%0A🏫 *Kelas:* ${currentStudent.studentClass}%0A💯 *Nilai Hasil Tes:* ${quizScore} / 100%0A💬 *Catatan Pujian:* ${compEn}%0A📅 *Tanggal:* ${dateStr}%0A%0ATerima kasih Guru! ✨`;
+            
+            const waLink = `https://wa.me/6285357959694?text=${waMessage}`;
+            document.getElementById('btn-wa-guru').href = waLink;
+        }
+
+        function saveAssessmentData(score, compliment) {
+            const history = JSON.parse(localStorage.getItem('fruits_assessment_records') || '[]');
+            const record = {
+                id: Date.now(),
+                name: currentStudent.name,
+                studentClass: currentStudent.studentClass,
+                score: score,
+                compliment: compliment,
+                date: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })
+            };
+            history.unshift(record);
+            localStorage.setItem('fruits_assessment_records', JSON.stringify(history));
+        }
+
+        function resetQuiz() {
+            playSound('click');
+            initQuiz();
+        }
+
+        /* MODE GURU / TEACHER DASHBOARD */
+        function openTeacherAuthModal() {
+            playSound('click');
+            document.getElementById('teacher-pin-input').value = '';
+            document.getElementById('modal-teacher-auth').classList.remove('hidden');
+        }
+
+        function closeTeacherAuthModal() {
+            playSound('click');
+            document.getElementById('modal-teacher-auth').classList.add('hidden');
+        }
+
+        function submitTeacherPin() {
+            const inputPin = document.getElementById('teacher-pin-input').value.trim();
+            if (inputPin === TEACHER_PIN) {
+                closeTeacherAuthModal();
+                renderTeacherAssessmentTable();
+                document.getElementById('modal-teacher-dashboard').classList.remove('hidden');
+            } else {
+                alert('PIN Salah! Masukkan PIN: 1234');
+            }
+        }
+
+        function closeTeacherDashboard() {
+            playSound('click');
+            document.getElementById('modal-teacher-dashboard').classList.add('hidden');
+        }
+
+        function renderTeacherAssessmentTable() {
+            const filter = document.getElementById('filter-class').value;
+            const records = JSON.parse(localStorage.getItem('fruits_assessment_records') || '[]');
+            const tbody = document.getElementById('assessment-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = filter === 'ALL' ? records : records.filter(r => r.studentClass === filter);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-4 text-center text-slate-400 italic">
+                            Belum ada rekap hasil ujian yang tersimpan.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filtered.forEach((rec, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = idx % 2 === 0 ? 'bg-white' : 'bg-purple-50/40';
+
+                let scoreBadgeClass = "bg-emerald-100 text-emerald-800 border-emerald-300";
+                if (rec.score <= 60) scoreBadgeClass = "bg-rose-100 text-rose-800 border-rose-300";
+                else if (rec.score <= 80) scoreBadgeClass = "bg-amber-100 text-amber-800 border-amber-300";
+
+                tr.innerHTML = `
+                    <td class="p-3 font-bold">${idx + 1}</td>
+                    <td class="p-3 font-black text-slate-800">${rec.name}</td>
+                    <td class="p-3 font-bold text-purple-700">Kelas ${rec.studentClass}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2.5 py-1 rounded-full border text-xs font-black ${scoreBadgeClass}">
+                            ${rec.score}
+                        </span>
+                    </td>
+                    <td class="p-3 text-[11px] font-semibold text-slate-600">${rec.compliment}</td>
+                    <td class="p-3 text-[10px] text-slate-400">${rec.date}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function clearAssessmentData() {
+            if (confirm('Apakah Ibu/Bapak Guru yakin ingin menghapus semua rekap nilai?')) {
+                localStorage.removeItem('fruits_assessment_records');
+                renderTeacherAssessmentTable();
+            }
+        }
+
+        window.onload = function() {
+            renderMemorizeCards();
+            initMemoryGame();
+            updateStudentProfileUI();
+        };
+    </script>
+</body>
+</html>
